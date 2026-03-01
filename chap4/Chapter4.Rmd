@@ -1,0 +1,152 @@
+---
+title: "Chapter 4"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code.
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*.
+
+```{r}
+facebookData <- read_delim("../Data files/FacebookNarcissism.dat", show_col_types = FALSE)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+```{r}
+graph <- ggplot(facebookData, aes(NPQC_R_Total, Rating))
+```
+
+```{r}
+graph + geom_point(aes(colour = Rating_Type))
+```
+
+```{r}
+graph + geom_point(aes(shape = Rating_Type))
+```
+
+```{r}
+examData <- read.delim("../Data files/Exam Anxiety.dat", header = TRUE)
+```
+
+```{r}
+scatter <- ggplot(examData, aes(Anxiety, Exam))
+```
+
+```{r}
+scatter + geom_point() + labs(x = "Exam Anxiety", y = "Exam
+Performance %")
+```
+
+```{r}
+scatter + geom_point() + geom_smooth() + labs(x = "Exam Anxiety",
+y = "Exam Performance %")
+```
+
+```{r}
+# fit a straight line
+scatter + geom_point() + geom_smooth(method = "lm", colour = "Red")+ labs(x
+= "Exam Anxiety", y = "Exam Performance %")
+```
+
+```{r}
+# fit a straight line with blue line and blue confidence interval
+scatter + geom_point() + geom_smooth(method = "lm", alpha = 0.1, fill = "Blue")+ labs(x
+= "Exam Anxiety", y = "Exam Performance %")
+```
+
+```{r}
+
+# grouped scatterplot for anxiety levels and exam scores relationship of male and female students
+# 
+scatter + geom_point() + geom_smooth(method = "lm", aes(fill = Gender), alpha
+= 0.1) + labs(x = "Exam Anxiety", y = "Exam Performance %", colour = "Gender")
+```
+```{r}
+festivalData <- read.delim("../Data files/DownloadFestival.dat", header = TRUE)
+```
+
+```{r}
+# detect outliers for variable day1
+# we find one which has exetreme outlier (value 20)
+festivalHistogram <- ggplot(festivalData, aes(day1))
+festivalHistogram + geom_histogram(binwidth = 0.4) + labs(x = "Hygiene (Day 1 of Festival)", y = "Frequency")
+```
+
+```{r}
+festivalBoxplot <- ggplot(festivalData, aes(gender, day1))
+festivalBoxplot + geom_boxplot() + labs(x = "Gender", y = "Hygiene (Day 1 of
+Festival)")
+```
+```{r}
+festivalData<-festivalData[order(festivalData$day1),]
+```
+
+```{r}
+density <- ggplot(festivalData, aes(day1))
+density
+```
+```{r}
+festivalData <- read.delim("../Data Files/DownloadFestival(No Outlier).dat", header = TRUE)
+```
+
+```{r}
+density + geom_density()
+```
+
+```{r}
+chickFlick <- read.delim("../Data Files/ChickFlick.dat", header = TRUE)
+```
+
+```{r}
+bar <- ggplot(chickFlick, aes(film, arousal))
+```
+
+```{r}
+bar + stat_summary(fun = mean, geom = "bar", fill = "White", colour
+= "Black") + stat_summary(fun.data = mean_cl_normal, geom = "pointrange") + labs(x = "Film", y = "Mean Arousal")
+```
+```{r}
+bar <- ggplot(chickFlick, aes(film, arousal, fill = gender))
+bar + stat_summary(fun = mean, geom = "bar", position="dodge")
+```
+```{r}
+bar + stat_summary(fun.y = mean, geom = "bar", position="dodge") + stat_summary(fun.data = mean_cl_normal, geom = "errorbar",position = position_dodge(width = 0.90), width = 0.2) + labs(x = "Film", y = "Mean Arousal", fill
+= "Gender")
+```
+```{r}
+bar <- ggplot(chickFlick, aes(film, arousal, fill = film))
+bar + stat_summary(fun = mean, geom = "bar") + stat_summary(fun.data = mean_cl_normal, geom = "errorbar", width=0.2) + facet_wrap(~ gender) + guides(fill = "none")
+
+```
+```{r}
+hiccupsData <- read.delim("../Data Files/Hiccups.dat", header = TRUE)
+hiccups <- stack(hiccupsData)
+names(hiccups) <- c("Hiccups", "Intervention")
+hiccups
+str(hiccups)
+```
+
+```{r}
+line <- ggplot(hiccups, aes(Intervention, Hiccups))
+line + stat_summary(fun = mean, geom = "point")
+line + stat_summary(fun = mean, geom = "line", aes(group=1))
+line + stat_summary(fun = mean, geom = "line", aes(group=1), color="Blue", linetype="dashed") + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Intervention", y = "Mean Number of Hiccups")
+```
+```{r}
+textData <- read.delim("../Data files/TextMessages.dat", header = TRUE)
+textData$id <- row(textData[1])
+textMessages <- melt(textData, id.vars = c("Group", "id"), measure.vars=c("Baseline", "Six_months"))
+names(textMessages) <- c("Group", "id", "Time", "Grammar_score")
+```
+
+```{r}
+line <- ggplot(textMessages, aes(Time, Grammar_score, colour = Group))
+line + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Group)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) +
+labs(x = "Time", y = "Mean Grammar Score", colour = "Group")
+```
+
