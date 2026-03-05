@@ -1,0 +1,28 @@
+---
+title: "Chapter 5"
+output: html_notebook
+---
+
+draw histograms and normal curves for scores on day1, 2 and 3
+
+```{r}
+dlf <- read.delim("../Data files/DownloadFestival(No Outlier).dat")
+hist.day1 <- ggplot(dlf, aes(day1))
+hist.day2 <- ggplot(dlf, aes(day2))
+hist.day3 <- ggplot(dlf, aes(day3))
+
+hist.day1 + geom_histogram(aes(y = ..density..), colour = "black", fill = "white") + stat_function(fun = dnorm, args = list(mean = mean(dlf$day1, na.rm =TRUE), sd = sd(dlf$day1, na.rm=TRUE)), colour = "black",size=1)
+hist.day2 + geom_histogram(aes(y = ..density..), colour = "black", fill = "white")  + stat_function(fun = dnorm, args = list(mean = mean(dlf$day2, na.rm =TRUE), sd = sd(dlf$day2, na.rm=TRUE)), colour = "black",size=1)
+hist.day3 + geom_histogram(aes(y = ..density..), colour = "black", fill = "white")  + stat_function(fun = dnorm, args = list(mean = mean(dlf$day3, na.rm =TRUE), sd = sd(dlf$day3, na.rm=TRUE)), colour = "black",size=1)
+```
+
+Test if day1, day2, and day3 scores are normally distributed. we compare against normally distributed data for all 3 days. if we have vertical line, it means that the data is perfectly normally distributed.
+
+```{r}
+qqplot.day1 <- ggplot(dlf, aes(sample=day1)) + stat_qq() + labs(x = "day1 theoretical score", y = "day1 actual score")
+qqplot.day2 <- ggplot(dlf, aes(sample=day2)) + stat_qq() + labs(x = "day2 theoretical score", y = "day2 actual score")
+qqplot.day3 <- ggplot(dlf, aes(sample=day3)) + stat_qq() + labs(x = "day3 theoretical score", y = "day3 actual score")
+qqplot.day1
+qqplot.day2
+qqplot.day3
+```
