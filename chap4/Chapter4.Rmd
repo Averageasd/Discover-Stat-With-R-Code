@@ -149,4 +149,7 @@ line <- ggplot(textMessages, aes(Time, Grammar_score, colour = Group))
 line + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Group)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) +
 labs(x = "Time", y = "Mean Grammar Score", colour = "Group")
 ```
+```{r}
+
+```
 
