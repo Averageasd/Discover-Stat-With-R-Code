@@ -26,3 +26,147 @@ qqplot.day1
 qqplot.day2
 qqplot.day3
 ```
+
+```{r}
+describe(dlf$day1)
+```
+
+```{r}
+stat.desc(dlf$day1, basic = FALSE, norm = TRUE)
+```
+
+```{r}
+describe(cbind(dlf$day1, dlf$day2, dlf$day3))
+
+```
+
+```{r}
+rexam <- read.delim("../Data files/rexam.dat", header=TRUE)
+```
+
+```{r}
+str(rexam)
+```
+
+```{r}
+rexam$uni <- factor(rexam$uni, levels = c(0:1), labels = c("Duncetown University", "Sussex University"))
+```
+
+```{r}
+stat.desc(cbind(rexam$exam, rexam$computer, rexam$lectures, rexam$numeracy), basic = FALSE, norm = TRUE)
+```
+
+```{r}
+exam_scores_plot <- ggplot(rexam, aes(exam))
+computer_literacy_plot <- ggplot(rexam, aes(computer))
+lectures_attended_plot <- ggplot(rexam, aes(lectures))
+numeracy_attended_plot <- ggplot(rexam, aes(numeracy))
+
+exam_scores_plot + geom_histogram(aes(y = ..density..), color="black", fill="white") + labs(x = "exam scrore") + stat_function(fun = dnorm, args = list(mean = mean(rexam$exam, na.rm =TRUE), sd = sd(rexam$exam, na.rm=TRUE)), colour = "blue",size=1)
+computer_literacy_plot + geom_histogram(aes(y = ..density..), color="black", fill="white") + labs(x = "computer literacy") + stat_function(fun = dnorm, args = list(mean = mean(rexam$computer, na.rm =TRUE), sd = sd(rexam$computer, na.rm=TRUE)), colour = "blue",size=1)
+lectures_attended_plot + geom_histogram(aes(y = ..density..), color="black", fill="white") + labs(x = "lectures attended") + stat_function(fun = dnorm, args = list(mean = mean(rexam$lectures, na.rm =TRUE), sd = sd(rexam$lectures, na.rm=TRUE)), colour = "blue",size=1)
+numeracy_attended_plot + geom_histogram(aes(y = ..density..), color="black", fill="white") + labs(x = "numeracy test") + stat_function(fun = dnorm, args = list(mean = mean(rexam$numeracy, na.rm =TRUE), sd = sd(rexam$numeracy, na.rm=TRUE)), colour = "blue",size=1)
+```
+
+```{r}
+by(cbind(data=rexam$exam,data=rexam$numeracy), rexam$uni, stat.desc, basic = FALSE, norm = TRUE)
+dunceData<-subset(rexam, rexam$uni=="Duncetown University")
+sussexData<-subset(rexam, rexam$uni=="Sussex University")
+```
+
+```{r}
+hist.numeracy.duncetown <- ggplot(dunceData, aes(numeracy)) + geom_histogram(aes(y = ..density..), fill = "white",
+colour = "black", binwidth=1) + labs(x = "Duncetown Numeracy Score", y = "Density") + stat_function(fun=dnorm, args=list(mean = mean(dunceData$numeracy, na.rm = TRUE), sd = sd(dunceData$numeracy, na.rm = TRUE)), colour = "blue",
+size=1)
+hist.numeracy.duncetown
+
+hist.numeracy.sussex <- ggplot(sussexData, aes(numeracy)) + geom_histogram(aes(y = ..density..), fill = "white",
+colour = "black", binwidth=1) + labs(x = "Sussex Numeracy Score", y = "Density") + stat_function(fun=dnorm, args=list(mean = mean(sussexData$numeracy, na.rm = TRUE), sd = sd(sussexData$numeracy, na.rm = TRUE)), colour = "blue",
+size=1)
+hist.numeracy.sussex
+```
+
+```{r}
+by(cbind(data=rexam$lectures,data=rexam$computer), rexam$uni, stat.desc, basic = FALSE, norm = TRUE)
+```
+
+```{r}
+hist.lectures.duncetown <- ggplot(dunceData, aes(lectures)) + geom_histogram(aes(y = ..density..), fill = "white",
+colour = "black") + labs(x = "Duncetown lecture attendance percentage", y = "Density") + stat_function(fun=dnorm, args=list(mean = mean(dunceData$lectures, na.rm = TRUE), sd = sd(dunceData$lectures, na.rm = TRUE)), colour = "blue",
+size=1)
+hist.lectures.duncetown
+
+hist.lectures.sussex <- ggplot(sussexData, aes(lectures)) + geom_histogram(aes(y = ..density..), fill = "white",
+colour = "black") + labs(x = "Sussex lecture attendance percentage", y = "Density") + stat_function(fun=dnorm, args=list(mean = mean(sussexData$lectures, na.rm = TRUE), sd = sd(sussexData$lectures, na.rm = TRUE)), colour = "blue",
+size=1)
+hist.lectures.sussex
+```
+
+Q-Q plots for both exam and numeracy show that the data for these 2 variables are not normally distributed.
+
+```{r}
+shapiro.test(rexam$exam)
+shapiro.test(rexam$numeracy)
+```
+
+```{r}
+by(rexam$exam, rexam$uni, shapiro.test)
+by(rexam$numeracy, rexam$uni, shapiro.test)
+```
+
+```{r}
+ggplot(rexam, aes(sample=exam)) + stat_qq() + labs(x = "exam theoretical score", y = "exam actual score")
+
+ggplot(rexam, aes(sample=numeracy)) + stat_qq() + labs(x = "numeracy theoretical score", y = "numeracy actual score")
+```
+
+Levene's test to test the equality of variance of exam scores and numeracy for each each university.
+
+R exam score variances are similar for both universities
+
+```{r}
+leveneTest(rexam$exam, rexam$uni)
+```
+
+numeracy score variances are siginificantly different in 2 groups
+
+```{r}
+leveneTest(rexam$numeracy, rexam$uni)
+```
+
+Transform variables to fix the skewness of day2 and day3 scores. taking log of each values. 
+
+```{r}
+dlf$logday1 <- log(dlf$day1 + 1)
+dlf$logday2 <- log(dlf$day2 + 1)
+dlf$logday3 <- log(dlf$day3 + 1)
+
+ggplot(dlf, aes(logday1)) + geom_histogram(aes(y = ..density..), fill = "white",
+colour = "black")
+
+ggplot(dlf, aes(logday2)) + geom_histogram(aes(y = ..density..), fill = "white",
+colour = "black")
+
+ggplot(dlf, aes(logday3)) + geom_histogram(aes(y = ..density..), fill = "white",
+colour = "black")
+```
+```{r}
+dlf$sqrtday1 <- sqrt(dlf$day1)
+dlf$sqrtday2 <- sqrt(dlf$day2)
+dlf$sqrtday3 <- sqrt(dlf$day3)
+
+ggplot(dlf, aes(sqrtday1)) + geom_histogram(aes(y = ..density..), fill = "white",
+colour = "black")
+
+ggplot(dlf, aes(sqrtday2)) + geom_histogram(aes(y = ..density..), fill = "white",
+colour = "black")
+
+ggplot(dlf, aes(sqrtday3)) + geom_histogram(aes(y = ..density..), fill = "white",
+colour = "black")
+```
+
+```{r}
+# mean hygiene score of 3 variables (values in 3 columns): day1, day2, day3 for each row. 
+dlf$meanHygiene <- rowMeans(cbind(dlf$day1, dlf$day2, dlf$day3) ,  na.rm = TRUE)
+```
+
