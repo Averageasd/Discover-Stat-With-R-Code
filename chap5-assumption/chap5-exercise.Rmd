@@ -1,0 +1,43 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+chickFlick <- read.delim("../Data files/Chickflick.dat", header=TRUE)
+chickFlick$film <- as.factor(chickFlick$film)
+memento_film <- chickFlick[chickFlick$film == "Memento", ]
+diary_film <- chickFlick[chickFlick$film == "Bridget Jones' Diary", ]
+```
+
+Looking at sknewness we find that the sknewness for arousal for both movies are pretty close to 0. The mean and median are pretty close to each other. This indicates that the arousal movie data are mostly clustered around the mean.Diary Movie arousal data are slightly negative skewed. Both absolute values of standardized kurtois of arousal data for both movie are way lower than 1 indicating that there are few extreme arousal outliers.
+
+```{r}
+by(chickFlick$arousal, chickFlick$film, stat.desc, basic = FALSE, norm = TRUE)
+```
+
+Performing Shapiro-Wilk test, we find that the results are statistically insignificant for two movies. We don't reject the hypothesis that the arousal data for both are normally distributed and the Shapiro-Wilk test works.
+
+```{r}
+by(chickFlick$arousal, chickFlick$film, shapiro.test)
+```
+
+Histograms with the normal curves further confirm that the arousal data for both movies are normally distributed even though arousal data for diary movie is slightly skewed to the left but as we state above, the mean and median are very close to each other. There is no long tail on both end of the distribution
+
+```{r}
+ggplot(memento_film, aes(arousal)) + geom_histogram(aes(y = ..density..), fill = "white",
+colour = "black", binwidth=2) + labs(x = "memento arousal", y = "Density") + stat_function(fun=dnorm, args=list(mean = mean(memento_film$arousal, na.rm = TRUE), sd = sd(memento_film$arousal, na.rm = TRUE)), colour = "blue",
+size=1)
+
+ggplot(diary_film, aes(arousal)) + geom_histogram(aes(y = ..density..), fill = "white",
+colour = "black", binwidth=2) + labs(x = "diary arousal", y = "Density") + stat_function(fun=dnorm, args=list(mean = mean(diary_film$arousal, na.rm = TRUE), sd = sd(diary_film$arousal, na.rm = TRUE)), colour = "blue",
+size=1)
+```
+
+Since the mean and median for both arousal data are very close, we will use mean as the center. The Levene’s test has p-value \> 0.05. This indicates that the result is statistically insignificant and the variances of arousal between 2 movies are not significantly different
+
+```{r}
+leveneTest(chickFlick$arousal, chickFlick$film, center = mean)
+```
+
+With the analysis above, we can conclude that normality and variance homogenity assumptions are met.

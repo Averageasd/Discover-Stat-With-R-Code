@@ -170,3 +170,7 @@ colour = "black")
 dlf$meanHygiene <- rowMeans(cbind(dlf$day1, dlf$day2, dlf$day3) ,  na.rm = TRUE)
 ```
 
+```{r}
+
+```
+

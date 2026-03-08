@@ -1,0 +1,105 @@
+---
+title: "Chap 6"
+output: html_notebook
+---
+
+```{r}
+adverts<-c(5,4,4,6,8)
+packets<-c(8,9,10,13,15)
+advertData<-data.frame(adverts, packets)
+
+ggplot(advertData, aes(x=adverts, y=packets)) + 
+    geom_point()
+```
+```{r}
+examData <- read.delim("../Data Files/Exam Anxiety.dat", header = TRUE)
+```
+
+```{r}
+examData2 <- examData[, c("Exam", "Anxiety", "Revise")]
+cor(examData2)
+```
+```{r}
+# confidence interval of correlation between anxiety and exam score. it is a range of values that is likely to capture the true population correlation
+cor.test(examData$Anxiety, examData$Exam)
+```
+```{r}
+cor.test(examData$Revise, examData$Exam)
+cor.test(examData$Revise, examData$Anxiety)
+```
+```{r}
+cor(examData2) ^ 2
+```
+```{r}
+liarData <- read.delim("../Data files/The Biggest Liar.dat", header = TRUE)
+```
+
+```{r}
+cor(liarData$Position, liarData$Creativity, method = "spearman")
+```
+```{r}
+cor.test(liarData$Position, liarData$Creativity, alternative = "less",
+method = "spearman")
+```
+```{r}
+# good when data points have same rank
+cor(liarData$Position, liarData$Creativity, method = "kendall")
+```
+```{r}
+
+# we know there is a negative correlation so we want to see if there is a signifiant negative association between 2 variables
+cor.test(liarData$Position, liarData$Creativity,
+alternative = "less", method = "kendall")
+```
+```{r}
+bootTau<-function(liarData,i) cor(liarData$Position[i], liarData$Creativity[i], use = "complete.obs", method = "kendall")
+```
+
+```{r}
+boot_kendall<-boot(liarData, bootTau, 2000)
+boot_kendall
+boot.ci(boot_kendall)
+```
+
+```{r}
+catData = read.csv("../Data Files/pbcorr.csv", header = TRUE)
+```
+
+since we code 1 for male and we have positive correlation, we can conclude that male cats spend more time away from home
+```{r}
+cor(catData$time, catData$gender, method = "pearson")
+```
+```{r}
+cor.test(catData$time, catData$gender)
+```
+since we code 1 for female and we have negative correlation, we can conclude that female cats spend less time away from home (gender increases (from 0 to 1), time decreases)
+```{r}
+cor(catData$time, catData$recode, method = "pearson")
+```
+
+```{r}
+catFrequencies <- table(catData$gender)
+prop.table(catFrequencies)
+```
+biserial correlation assuming that we have some continuum for cat genders. 
+```{r}
+polyserial(catData$time, catData$gender)
+```
+when we ignore effect of third variable Revise, the correlation between Exam and Anxiety drops significantly. the exam anxeity can only account for 6% of exam score instead of 19.4 like before
+```{r}
+pc <- pcor(c("Exam", "Anxiety", "Revise"), var(examData2))
+pc
+pc ^ 2
+pcor.test(pc, 1, 103)
+```
+
+```{r}
+women_examDat <- examData[examData$Gender == "Female",]
+men_examDat <- examData[examData$Gender == "Male",]
+```
+
+```{r}
+cor(women_examDat$Anxiety, women_examDat$Exam)
+cor(men_examDat$Anxiety, men_examDat$Exam)
+```
+

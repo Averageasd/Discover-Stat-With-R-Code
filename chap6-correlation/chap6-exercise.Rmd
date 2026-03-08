@@ -1,0 +1,42 @@
+---
+title: "Chap 6 exercises"
+output: html_notebook
+---
+
+```{r}
+essayMarks <- read.delim("../Data files/EssayMarks.dat")
+essayMarks$grade <- as.factor(essayMarks$grade)
+essayMarks$grade_level <- c(1:45)
+essayMarks[essayMarks$grade == "First Class",]$grade_level <- 1
+essayMarks[essayMarks$grade == "Upper Second Class",]$grade_level <- 2
+essayMarks[essayMarks$grade == "Lower Second Class",]$grade_level <- 3
+essayMarks[essayMarks$grade == "Third Class",]$grade_level <- 4
+str(essayMarks)
+```
+
+Both variables are normally distributed by using shapiro-wilk test, we can use Spearman correlation. There is a positive correlation between time spent doing essays and essay numerical grades. We perform positive one-sided correlation test and find that the result is statistically significant. We further create a scatterplot to confirm our findings. We conclude that there is a significant positive relationship between
+
+```{r}
+cor(essayMarks$hours, essayMarks$essay)
+cor.test(essayMarks$hours, essayMarks$essay, alternative = "greater")
+shapiro.test(essayMarks$hours)
+shapiro.test(essayMarks$essay)
+ggplot(essayMarks, aes(x=hours, y=essay)) + geom_point()
+```
+
+We also measure motononic relationship between degree class and essay grades and find that there is a negative assocation. However, the correlation is very weak since the p-value of the negative one-sided correlation test gives us 0.9325 which is statistically insignificant.
+
+```{r}
+cor(essayMarks$hours, essayMarks$grade_level, method="kendall")
+cor.test(essayMarks$hours, essayMarks$essay, alternative = "less", method="kendall")
+```
+
+Since both variables are ordinal, we use Spearman's rho and Kendall's tau instead of Pearson's correlation. We predicted that there is a positive relationship gcse score and first year stat score. Using Spearman's rho and Kendall's tau, we conclude that there is a positive correlation between first year stat grades and gcse grades.The p-value from the one-sided positive correlation test gives us 0.01121 which is statistically significant result.
+
+```{r}
+grades <- read.csv("../Data files/grades.csv", header=TRUE)
+cor(grades$stats, grades$gcse, method = "spearman")
+cor.test(grades$stats, grades$gcse, alternative = "greater", method = "spearman")
+cor(grades$stats, grades$gcse, method = "kendall")
+cor.test(grades$stats, grades$gcse, alternative = "greater", method = "kendall")
+```
