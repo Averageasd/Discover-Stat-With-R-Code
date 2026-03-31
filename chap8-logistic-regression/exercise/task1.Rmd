@@ -1,0 +1,67 @@
+---
+title: "Exercise 1"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code.
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*.
+
+```{r}
+library(car)
+library(tidyverse)
+library(nnet)
+library(MASS)
+```
+
+```{r}
+display_data <- read.delim('../../Data files/Display.dat', header = TRUE)
+display_data <-
+  display_data |> mutate(
+    fb = as.factor(if_else(fb == "Yes", 1, 0)),
+    display = as.factor(if_else(display == "Yes",1,0))
+  )
+```
+
+Model1: predict understanding of display using whether they pass belief test, age and interaction between belief test and age
+
+```{r}
+predict_understand_display_model <- glm(data=display_data, display ~ age + fb + (age * fb), binomial())
+```
+
+We can see that all predictors are statistically insignificant. fb has the highest odd-ratio. interaction between age and fb has the lowest odd ratio.
+
+```{r}
+summary(predict_understand_display_model)
+exp(predict_understand_display_model$coefficients)
+```
+
+Model2: predict understanding of display using only fb. AIC is lower. the unexplained variance does go up a bit compared to model1.
+
+```{r}
+predict_understand_display_model_using_fb <- glm(data=display_data, display ~ fb, binomial())
+summary(predict_understand_display_model_using_fb)
+```
+
+Find difference in deviance statistics. use chi-sq test to test if this difference is significant.
+
+The deviance statistics is not significant. this means that using other predictors other than fb does not significantly improve the model.
+
+```{r}
+model_chi <- predict_understand_display_model_using_fb$deviance - predict_understand_display_model$deviance
+chidf <- predict_understand_display_model_using_fb$df.residual - predict_understand_display_model$df.residual
+chisq.prob <- 1 - pchisq(model_chi, chidf)
+chisq.prob
+```
+
+There are some influential points. for studentized residuals, we cannot find any observations that exceed 2.
+
+```{r}
+stud_resids <- rstandard(predict_understand_display_model_using_fb)
+unique(which(abs(stud_resids) > 2))
+
+cook_dist <- cooks.distance(predict_understand_display_model_using_fb)
+unique(which(cook_dist > (4/dim(display_data)[1])))
+```
+
+**Conclusion**: The false believe understanding is the strongest predictor. And the model using only this predictor is sufficient. Though, you can use the other one that contains more predictors.

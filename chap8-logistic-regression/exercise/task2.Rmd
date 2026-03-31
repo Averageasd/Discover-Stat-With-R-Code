@@ -1,0 +1,51 @@
+---
+title: "task 2"
+output: html_notebook
+---
+
+```{r}
+library(car)
+library(tidyverse)
+library(nnet)
+library(MASS)
+```
+
+```{r}
+rm(list = ls())
+burnout_data <- read.delim('../../Data files/Burnout.dat', header = TRUE)
+glimpse(burnout_data)
+burnout_data <-
+  burnout_data |>
+  mutate(
+    burnout = as.factor(if_else(burnout == "Burnt Out", 1, 0))
+  )
+```
+
+```{r}
+burnout_data |>
+  filter(burnout == "1") |>
+  head(5)
+```
+
+We first build a base model using only perceived control and coping style
+
+```{r}
+base_model <- glm(data = burnout_data, burnout ~ cope + loc, binomial())
+summary(base_model)
+exp(base_model$coefficients)
+```
+
+```{r}
+model_using_all_predictors <- glm(data = burnout_data, burnout ~ cope + loc + teaching + research + pastoral, binomial())
+summary(model_using_all_predictors)
+exp(model_using_all_predictors$coefficients)
+```
+
+```{r}
+model_chi <- base_model$deviance - model_using_all_predictors$deviance
+chidf <- base_model$df.residual - model_using_all_predictors$df.residual
+chisq.prob <- 1 - pchisq(model_chi, chidf)
+chisq.prob
+```
+
+AIC in model using all predictors is much lower. Also, after looking at the difference in deviance stats, we find that p-value of chisq test is significant. This means that the model using all predictors is a significant improvement over the base model. Coping style and level of perceived control are strongest predictors in our model. teaching score has a negative relationship with burnout. teaching score reduces the odd of having burnout by 89 percent. 
