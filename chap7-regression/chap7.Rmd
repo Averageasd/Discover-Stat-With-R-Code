@@ -1,0 +1,42 @@
+---
+title: "Chap 7"
+output: html_notebook
+---
+
+```{r}
+album1<-read.delim("../Data files/Album Sales 1.dat", header = TRUE)
+```
+
+```{r}
+albumSales.1 <- lm(sales ~ adverts, data = album1)
+```
+
+F-statisic with p -value of 2.2e-16. it means that the model results in significant better prediction than just mean. 
+```{r}
+summary(albumSales.1)
+```
+```{r}
+album2<-read.delim("../Data files/Album Sales 2.dat", header = TRUE)
+```
+
+```{r}
+albumSales.2 <- lm(sales ~ adverts, data = album2)
+```
+
+```{r}
+albumSales.3 <- lm(sales ~ adverts + airplay + attract, data = album2)
+summary(albumSales.3)
+```
+standardized beta values measured in standard deviations. make it easier to interpet. tell us the importance of each predictor. higher absolute values => more importance
+```{r}
+lm.beta(albumSales.3)
+```
+Compare 2 models to see 2nd model fits better than 1st model.
+look at f-statistic and associated p-value
+```{r}
+anova(albumSales.2, albumSales.3)
+```
+```{r}
+
+```
+
